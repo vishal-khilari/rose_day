@@ -1,0 +1,534 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Rose Day - Watch Love Bloom</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Georgia", serif;
+        background: linear-gradient(
+          135deg,
+          #ffeef8 0%,
+          #ffe0f0 50%,
+          #ffd4e8 100%
+        );
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        cursor: pointer;
+        position: relative;
+      }
+
+      .container {
+        text-align: center;
+        position: relative;
+        z-index: 10;
+        width: 100%;
+        max-width: 1200px;
+        padding: 0 1rem;
+        overflow: hidden;
+      }
+
+      .title {
+        font-size: clamp(2.2rem, 5vw, 3rem);
+        color: #c75b7a;
+        margin-bottom: 0.8rem;
+        letter-spacing: 2px;
+      }
+
+      .subtitle {
+        font-size: clamp(1rem, 2.5vw, 1.2rem);
+        margin-bottom: 3rem;
+        color: #d88ca0;
+        font-style: italic;
+      }
+
+      .rose-container {
+        position: relative;
+        width: min(300px, 80vw);
+        height: min(60vh, 520px);
+        margin: 4vh auto 2rem;
+        overflow: visible; /* 👈 ADD THIS LINE */
+      }
+
+      .soil {
+        position: absolute;
+        bottom: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 200px;
+        height: 40px;
+        background: linear-gradient(to bottom, #8b6f47, #6b5436);
+        border-radius: 50% 50% 0 0 / 20% 20% 0 0;
+        z-index: 1;
+      }
+
+      .seed {
+        position: absolute;
+        bottom: 35px;
+        left: 50%;
+        transform: translateX(-50%) scale(0);
+        width: 20px;
+        height: 25px;
+        background: linear-gradient(135deg, #d4a574 0%, #b8936d 100%);
+        border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+        opacity: 0;
+        transition: all 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+        z-index: 2;
+      }
+
+      .seed.visible {
+        opacity: 1;
+        transform: translateX(-50%) scale(1);
+      }
+      .stem {
+        position: absolute;
+        bottom: 40px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 8px;
+        height: 0;
+        background: linear-gradient(to right, #2d5016, #4a7c2c, #2d5016);
+        border-radius: 4px;
+        transition: height 1.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+      }
+
+      .stem.grow {
+        height: min(45vh, 260px);
+      }
+
+      .leaf {
+        position: absolute;
+        width: 30px;
+        height: 20px;
+        background: linear-gradient(135deg, #5ba03b 0%, #3d7828 100%);
+        border-radius: 0 50% 50% 50%;
+        opacity: 0;
+        transition: all 0.8s ease;
+      }
+
+      .leaf.left {
+        left: -25px;
+        top: 80px;
+        transform: rotate(-45deg) scale(0);
+      }
+
+      .leaf.right {
+        right: -25px;
+        top: 120px;
+        transform: rotate(45deg) scale(0) scaleX(-1);
+      }
+
+      .leaf.visible {
+        opacity: 1;
+      }
+
+      .leaf.left.visible {
+        transform: rotate(-45deg) scale(1);
+      }
+
+      .leaf.right.visible {
+        transform: rotate(45deg) scale(1) scaleX(-1);
+      }
+
+      .bud {
+        position: absolute;
+        bottom: 100%;
+        left: 50%;
+        transform: translateX(-50%) scale(0);
+        width: 40px;
+        height: 50px;
+        opacity: 0;
+        z-index: 3;
+        transition: all 1s cubic-bezier(0.34, 1.56, 0.64, 1);
+      }
+
+      .bud.visible {
+        opacity: 1;
+        transform: translateX(-50%) scale(1);
+      }
+
+      .bud::before,
+      .bud::after {
+        content: "";
+        position: absolute;
+        width: 15px;
+        height: 30px;
+        background: linear-gradient(135deg, #5ba03b 0%, #4a7c2c 100%);
+        border-radius: 0 50% 50% 0;
+        top: 10px;
+      }
+
+      .bud::before {
+        left: -8px;
+        transform: rotate(-20deg);
+      }
+
+      .bud::after {
+        right: -8px;
+        transform: rotate(20deg) scaleX(-1);
+      }
+
+      .rose {
+        position: absolute;
+        bottom: 100%;
+        left: 50%;
+        transform: translateX(-50%) scale(0);
+        width: clamp(80px, 18vw, 120px);
+        height: clamp(80px, 18vw, 120px);
+        opacity: 0;
+        z-index: 4;
+      }
+
+      .rose.bloom {
+        opacity: 1;
+        transform: translateX(-50%) scale(1);
+      }
+
+      .rose.glow {
+        filter: drop-shadow(0 0 20px rgba(232, 140, 168, 0.6));
+        animation: gentleGlow 3s ease-in-out infinite;
+      }
+
+      @keyframes gentleGlow {
+        0%,
+        100% {
+          filter: drop-shadow(0 0 20px rgba(232, 140, 168, 0.6));
+        }
+        50% {
+          filter: drop-shadow(0 0 30px rgba(232, 140, 168, 0.9));
+        }
+      }
+
+      .petal {
+        position: absolute;
+        width: 50px;
+        height: 60px;
+        background: linear-gradient(
+          135deg,
+          #ff9eb3 0%,
+          #e88ca8 50%,
+          #d4758f 100%
+        );
+        border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+      }
+
+      .petal:nth-child(1) {
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%) rotate(0deg) translateY(-35px);
+      }
+
+      .petal:nth-child(2) {
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%) rotate(72deg) translateY(-35px);
+      }
+
+      .petal:nth-child(3) {
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%) rotate(144deg) translateY(-35px);
+      }
+
+      .petal:nth-child(4) {
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%) rotate(216deg) translateY(-35px);
+      }
+
+      .petal:nth-child(5) {
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%) rotate(288deg) translateY(-35px);
+      }
+
+      .petal:nth-child(6),
+      .petal:nth-child(7),
+      .petal:nth-child(8) {
+        width: 35px;
+        height: 45px;
+        background: linear-gradient(135deg, #ffb3c6 0%, #ff9eb3 100%);
+      }
+
+      .petal:nth-child(6) {
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%) rotate(30deg) translateY(-20px);
+      }
+
+      .petal:nth-child(7) {
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%) rotate(150deg) translateY(-20px);
+      }
+
+      .petal:nth-child(8) {
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%) rotate(270deg) translateY(-20px);
+      }
+
+      .center {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 25px;
+        height: 25px;
+        background: radial-gradient(circle, #ffd700 0%, #ffb347 100%);
+        border-radius: 50%;
+      }
+
+      .message {
+        margin-top: 1rem;
+        font-size: 1.3rem;
+        color: #c75b7a;
+        opacity: 0;
+        transform: translateY(20px);
+        transition: all 1s ease;
+        max-width: 600px;
+        line-height: 1.8;
+        margin-left: auto;
+        margin-right: auto;
+      }
+
+      .message.visible {
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      .message-line {
+        display: block;
+        margin: 0.5rem 0;
+      }
+
+      .heart {
+        position: absolute;
+        font-size: 1.5rem;
+        color: #ff9eb3;
+        opacity: 0;
+        pointer-events: none;
+        animation: floatUp 4s ease-out forwards;
+      }
+
+      @keyframes floatUp {
+        0% {
+          opacity: 0;
+          transform: translateY(0) scale(0.5);
+        }
+        10% {
+          opacity: 1;
+        }
+        90% {
+          opacity: 1;
+        }
+        100% {
+          opacity: 0;
+          transform: translateY(-400px) scale(1.2) rotate(15deg);
+        }
+      }
+
+      .instruction {
+        position: relative;
+        margin-bottom: 1.5rem;
+        font-size: 0.95rem;
+        color: #d88ca0;
+        opacity: 0.8;
+      }
+
+      .instruction.hidden {
+        opacity: 0;
+      }
+
+      @media (max-width: 768px) {
+        .title {
+          font-size: 2rem;
+        }
+
+        .container {
+          padding-top: 3rem;
+        }
+
+        .subtitle {
+          font-size: 1rem;
+        }
+
+        .rose-container {
+          width: 250px;
+          height: 380px;
+        }
+
+        .stem.grow {
+          height: 180px;
+        }
+
+        .message {
+          font-size: 1.1rem;
+          padding: 0 1rem;
+        }
+
+        .instruction {
+          font-size: 0.9rem;
+          top: 1rem;
+        }
+      }
+
+      @media (max-height: 700px) {
+        .rose-container {
+          height: 350px;
+        }
+
+        .stem.grow {
+          height: 160px;
+        }
+
+        .message {
+          font-size: 1rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="instruction" id="instruction">
+      Click anywhere to nurture the rose 🌹
+    </div>
+
+    <div class="container">
+      <h1 class="title">Rose Day</h1>
+      <p class="subtitle">Every click is a moment of care</p>
+
+      <div class="rose-container">
+        <div class="soil"></div>
+        <div class="seed" id="seed"></div>
+
+        <div class="stem" id="stem">
+          <div class="leaf left" id="leaf1"></div>
+          <div class="leaf right" id="leaf2"></div>
+
+          <div class="bud" id="bud"></div>
+
+          <div class="rose" id="rose">
+            <div class="petal"></div>
+            <div class="petal"></div>
+            <div class="petal"></div>
+            <div class="petal"></div>
+            <div class="petal"></div>
+            <div class="petal"></div>
+            <div class="petal"></div>
+            <div class="petal"></div>
+            <div class="center"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="message" id="message">
+        <span class="message-line"
+          >Like this rose, love grows with patience.</span
+        >
+        <span class="message-line">Each moment you tend to it,</span>
+        <span class="message-line">it blooms a little more beautifully.</span>
+      </div>
+    </div>
+
+    <script>
+      let stage = 0;
+      let heartInterval = null;
+
+      const instruction = document.getElementById("instruction");
+      const seed = document.getElementById("seed");
+      const stem = document.getElementById("stem");
+      const leaf1 = document.getElementById("leaf1");
+      const leaf2 = document.getElementById("leaf2");
+      const bud = document.getElementById("bud");
+      const rose = document.getElementById("rose");
+      const message = document.getElementById("message");
+
+      function createHeart(x, y) {
+        const heart = document.createElement("div");
+        heart.className = "heart";
+        heart.textContent = "❤";
+        heart.style.left = x + "px";
+        heart.style.top = y + "px";
+        heart.style.animationDelay = Math.random() * 0.5 + "s";
+        document.body.appendChild(heart);
+
+        setTimeout(function () {
+          heart.remove();
+        }, 4000);
+      }
+
+      function handleClick(e) {
+        stage++;
+
+        if (stage === 1) {
+          seed.classList.add("visible");
+          setTimeout(function () {
+            instruction.textContent = "Keep clicking to help it grow 🌱";
+          }, 800);
+        } else if (stage === 2) {
+          seed.classList.remove("visible");
+          setTimeout(function () {
+            stem.classList.add("grow");
+          }, 300);
+          setTimeout(function () {
+            instruction.textContent = "It's growing beautifully! 🌿";
+          }, 800);
+        } else if (stage === 3) {
+          leaf1.classList.add("visible");
+          setTimeout(function () {
+            leaf2.classList.add("visible");
+          }, 300);
+          setTimeout(function () {
+            instruction.textContent = "Almost there... 🌺";
+          }, 800);
+        } else if (stage === 4) {
+          bud.classList.add("visible");
+          setTimeout(function () {
+            instruction.textContent = "One more click to see it bloom! 💫";
+          }, 800);
+        } else if (stage === 5) {
+          bud.classList.remove("visible");
+          rose.classList.add("bloom");
+
+          setTimeout(function () {
+            rose.classList.add("glow");
+            message.classList.add("visible");
+            instruction.classList.add("hidden");
+
+            heartInterval = setInterval(function () {
+              const x = Math.random() * window.innerWidth;
+              const y = window.innerHeight - 100;
+              createHeart(x, y);
+            }, 800);
+          }, 1500);
+        } else if (stage > 5) {
+          const x =
+            e.clientX ||
+            (e.touches && e.touches[0].clientX) ||
+            window.innerWidth / 2;
+          const y =
+            e.clientY ||
+            (e.touches && e.touches[0].clientY) ||
+            window.innerHeight / 2;
+          createHeart(x, y);
+        }
+      }
+
+      document.body.addEventListener("click", handleClick);
+      document.body.addEventListener("touchstart", function (e) {
+        e.preventDefault();
+        handleClick(e);
+      });
+    </script>
+  </body>
+</html>
